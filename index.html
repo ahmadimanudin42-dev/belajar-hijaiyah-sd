@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Hijaiyah Multisensori (Aset Lokal)</title>
+    <!-- Memuat Tailwind CSS untuk styling modern dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mengatur font Arabic agar terlihat jelas dan konsisten */
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap');
+        .arabic-font {
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            line-height: 1; /* Penting untuk memastikan karakter besar tidak terpotong */
+            user-select: none; /* Mencegah seleksi teks */
+        }
+        /* Style untuk efek visual multisensori */
+        .sensory-pulse {
+            transition: all 0.2s ease-out;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); /* Warna biru untuk fokus */
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 md:p-8 font-sans">
+
+    <!-- Memuat ikon lucide-react (digunakan sebagai SVG inline) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6', // Biru Cerah
+                        'secondary': '#10b981', // Hijau Tegas
+                    }
+                }
+            }
+        }
+    </script>
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800">
+                <span class="text-primary">✨ Belajar Hijaiyah Fathah ✨</span>
+            </h1>
+            <p class="text-lg text-gray-600 mt-2">
+                Tekan huruf untuk Mendengar bunyi Fathah ('a').
+            </p>
+            <p class="text-sm italic text-red-600 font-semibold mt-1">
+                Aplikasi ini membutuhkan 29 file MP3 di dalam folder **`audio/`**.
+            </p>
+        </header>
+
+        <!-- AREA TAMPILAN HURUF AKTIF (VISUAL & KINESTETIK) -->
+        <div id="display-area" class="bg-white p-6 md:p-10 rounded-xl shadow-2xl mb-8 border-b-4 border-primary/50 text-center cursor-pointer hover:shadow-primary/30 transition duration-300 ease-in-out"
+             onclick="playCurrentAudio()">
+            
+            <div id="arabic-letter" class="arabic-font text-[12rem] md:text-[18rem] text-gray-900 font-bold leading-none h-48 md:h-72 flex items-center justify-center transition duration-300">
+                ا
+            </div>
+            
+            <p id="letter-name" class="text-2xl md:text-3xl font-semibold text-primary mt-4">A</p>
+            
+            <p class="text-sm text-gray-500 mt-3">
+                (Klik di sini untuk mendengarkan ulang)
+            </p>
+        </div>
+
+        <!-- AREA PILIHAN HURUF (GRID INTERAKTIF) -->
+        <div id="buttons-area" class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 md:gap-3">
+            <!-- Tombol-tombol akan di-generate oleh JavaScript -->
+        </div>
+
+        <!-- AUDIO PLAYER (Tersembunyi) -->
+        <audio id="audio-player" preload="auto"></audio>
+
+        <!-- KOTAK PESAN (Untuk Notifikasi Audio Hilang) -->
+        <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 opacity-0 pointer-events-none" role="alert">
+            <strong class="font-bold">Error Audio!</strong>
+            <span id="message-text" class="block sm:inline">File audio tidak ditemukan.</span>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Huruf Hijaiyah. 'name' adalah nama yang ditampilkan, 'file' adalah nama file .mp3
+        const HIJAIYAH_LETTERS = {
+            // Menggunakan nama Fathah untuk tampilan, tetapi nama file standar untuk kemudahan perekaman
+            "A": { arabic: "ا", file: "alif" },
+            "Ba": { arabic: "ب", file: "ba" },
+            "Ta": { arabic: "ت", file: "ta" },
+            "Tsa": { arabic: "ث", file: "tsa" },
+            "Ja": { arabic: "ج", file: "jim" },
+            "Ha(b)": { arabic: "ح", file: "ha" }, // Ha' Besar
+            "Kha": { arabic: "خ", file: "kha" },
+            "Da": { arabic: "د", file: "dal" },
+            "Dza": { arabic: "ذ", file: "dzal" },
+            "Ra": { arabic: "ر", file: "ra" },
+            "Za": { arabic: "ز", file: "zay" },
+            "Sa": { arabic: "س", file: "sin" },
+            "Sha": { arabic: "ش", file: "shin" },
+            "Sso": { arabic: "ص", file: "shod" }, // Shod (Tebal)
+            "Dho": { arabic: "ض", file: "dhud" }, // Dhod (Tebal)
+            "Tho": { arabic: "ط", file: "tho" }, // Tho (Tebal)
+            "Zho": { arabic: "ظ", file: "zho" }, // Zho (Tebal)
+            "'A": { arabic: "ع", file: "ain" }, // Ain
+            "Gha": { arabic: "غ", file: "ghain" },
+            "Fa": { arabic: "ف", file: "fa" },
+            "Qo": { arabic: "ق", file: "qof" }, // Qof (Tebal)
+            "Ka": { arabic: "ك", file: "kaf" },
+            "La": { arabic: "ل", file: "lam" },
+            "Ma": { arabic: "م", file: "mim" },
+            "Na": { arabic: "ن", file: "nun" },
+            "Wa": { arabic: "و", file: "waw" },
+            "Ha(k)": { arabic: "هـ", file: "ha2" }, // Ha' Kecil
+            "A'": { arabic: "ء", file: "hamzah" }, // Hamzah
+            "Ya": { arabic: "ي", file: "ya" }
+        };
+
+        let currentLetter = HIJAIYAH_LETTERS["A"];
+        const audioPlayer = document.getElementById('audio-player');
+        const displayArea = document.getElementById('display-area');
+        const arabicLetterEl = document.getElementById('arabic-letter');
+        const letterNameEl = document.getElementById('letter-name');
+        const buttonsArea = document.getElementById('buttons-area');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        /**
+         * Menampilkan pesan kesalahan atau notifikasi sementara.
+         * @param {string} msg Pesan yang akan ditampilkan.
+         */
+        function showMessage(msg) {
+            messageText.textContent = msg;
+            messageBox.classList.remove('opacity-0', 'pointer-events-none');
+            // Sembunyikan setelah 3 detik
+            setTimeout(() => {
+                messageBox.classList.add('opacity-0', 'pointer-events-none');
+            }, 5000);
+        }
+
+        /**
+         * Memperbarui tampilan utama (huruf dan nama).
+         * Menerapkan efek visual 'tracing' untuk aspek kinestetik/multisensori.
+         */
+        function updateDisplay() {
+            arabicLetterEl.textContent = currentLetter.arabic;
+            letterNameEl.textContent = currentLetter.name;
+
+            // Efek visual pulsing (simulasi sentuhan/tracing)
+            displayArea.classList.add('sensory-pulse');
+            setTimeout(() => {
+                displayArea.classList.remove('sensory-pulse');
+            }, 500);
+
+            // Perbarui status aktif pada tombol
+            document.querySelectorAll('.letter-button').forEach(btn => {
+                if (btn.dataset.letter === currentLetter.name) {
+                    btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
+                    btn.classList.remove('bg-gray-200', 'hover:bg-primary/20', 'text-gray-800');
+                } else {
+                    btn.classList.remove('bg-secondary', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-gray-200', 'hover:bg-primary/20', 'text-gray-800');
+                }
+            });
+        }
+
+        /**
+         * Memutar audio yang sesuai dengan huruf saat ini.
+         */
+        window.playCurrentAudio = function() {
+            // Path audio harus menunjuk ke subfolder 'audio'
+            const audioPath = `audio/${currentLetter.file}.mp3`;
+            
+            // Menghentikan pemutaran yang sedang berjalan
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+
+            audioPlayer.src = audioPath;
+            audioPlayer.play()
+                .then(() => {
+                    // Audio berhasil dimainkan
+                })
+                .catch(error => {
+                    // Menangkap error jika file tidak ditemukan (404) atau masalah path
+                    console.error("Gagal memutar audio:", error.message);
+                    showMessage(`File audio untuk huruf '${currentLetter.name}' TIDAK DITEMUKAN di: ${audioPath}. Pastikan sudah direkam dan diunggah.`);
+                });
+
+            // Terapkan efek visual
+            updateDisplay();
+        }
+
+        /**
+         * Menangani pemilihan huruf baru dari grid tombol.
+         * @param {string} letterName Nama huruf yang dipilih.
+         */
+        function selectLetter(letterName) {
+            currentLetter = HIJAIYAH_LETTERS[letterName];
+            currentLetter.name = letterName; // Simpan nama huruf yang ditampilkan
+            updateDisplay();
+            playCurrentAudio();
+        }
+
+        /**
+         * Membuat tombol-tombol interaktif untuk setiap huruf.
+         */
+        function renderButtons() {
+            buttonsArea.innerHTML = '';
+            // Mengubah objek menjadi array untuk memproses
+            Object.keys(HIJAIYAH_LETTERS).forEach(name => {
+                const letter = HIJAIYAH_LETTERS[name];
+                
+                // Menambahkan nama ke objek untuk kemudahan akses
+                letter.name = name;
+
+                const button = document.createElement('button');
+                button.className = 'letter-button arabic-font text-3xl md:text-5xl font-bold p-2 md:p-3 rounded-lg border-2 transition-all duration-200 bg-gray-200 hover:bg-primary/20 text-gray-800 border-gray-300';
+                button.textContent = letter.arabic;
+                button.dataset.letter = name;
+                button.onclick = () => selectLetter(name);
+                
+                buttonsArea.appendChild(button);
+            });
+            
+            // Inisialisasi tampilan awal
+            selectLetter("A");
+        }
+
+        // Jalankan fungsi rendering saat dokumen selesai dimuat
+        window.onload = renderButtons;
+    </script>
+
+</body>
+</html>
