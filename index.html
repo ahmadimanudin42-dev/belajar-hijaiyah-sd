@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Belajar Hijaiyah Multisensori (Tracing)</title>
-    <!-- Memuat Tailwind CSS untuk styling modern dan responsif -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Mengatur font Arabic agar terlihat jelas dan konsisten */
@@ -26,21 +25,19 @@
             position: absolute;
             top: 0;
             left: 0;
-            /* Pastikan kanvas menutupi seluruh area huruf */
             z-index: 10; 
             cursor: crosshair;
         }
         /* Kontainer untuk menumpuk Huruf Arab Panduan dan Canvas */
         .tracing-stack {
             position: relative;
-            /* Memastikan stack mengisi seluruh area yang tersedia di kotak tracing */
             height: 90%; 
             width: 100%;
         }
         /* Huruf Arab panduan di bawah canvas */
         #guide-letter {
             z-index: 5;
-            pointer-events: none; /* Penting agar sentuhan hanya melalui canvas */
+            pointer-events: none; 
         }
         /* Mengatur tampilan huruf di kotak audio */
         #arabic-letter {
@@ -74,7 +71,6 @@
             </p>
         </header>
         
-        <!-- PANDUAN JELAS -->
         <div class="bg-accent/10 p-4 md:p-5 rounded-xl shadow-inner mb-8 border-l-4 border-accent">
             <h2 class="text-xl font-bold text-accent mb-2">PANDUAN LATIHAN:</h2>
             <ol class="list-decimal list-inside text-gray-700 space-y-1 ml-4 text-base">
@@ -84,14 +80,12 @@
             </ol>
         </div>
 
-        <!-- AREA TAMPILAN DUA KOLOM (VISUAL/AUDIO & TRACING/KINESTETIK) -->
-        <div id="display-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-[36rem] md:h-[30rem]">
+        <div id="display-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-auto md:h-[30rem]">
             
-            <!-- KOTAK KIRI: VISUAL & AUDIO -->
-            <div id="visual-audio-box" class="bg-white p-6 md:p-10 rounded-xl shadow-2xl border-b-4 border-primary/50 text-center flex flex-col justify-center items-center transition duration-300 ease-in-out">
+            <div id="visual-audio-box" class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-primary/50 text-center flex flex-col justify-center items-center transition duration-300 ease-in-out">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Kotak 1: Lihat & Dengarkan</h3>
                 <div id="arabic-letter" 
-                     class="arabic-font text-[10rem] md:text-[12rem] text-gray-900 font-bold h-48 flex items-center justify-center cursor-pointer hover:scale-105 transition duration-200"
+                     class="arabic-font text-[8rem] sm:text-[10rem] md:text-[12rem] text-gray-900 font-bold h-36 sm:h-48 md:h-56 flex items-center justify-center cursor-pointer hover:scale-105 transition duration-200"
                      onclick="playCurrentAudio()">
                     ا
                 </div>
@@ -101,16 +95,13 @@
                 </button>
             </div>
             
-            <!-- KOTAK KANAN: TRACING (SENTUHAN) -->
-            <div id="tracing-box" class="bg-gray-100 p-4 md:p-6 rounded-xl shadow-2xl border-b-4 border-accent/50 text-center flex flex-col justify-between">
+            <div id="tracing-box" class="bg-gray-100 p-4 rounded-xl shadow-2xl border-b-4 border-accent/50 text-center flex flex-col justify-between">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Kotak 2: Latih Jiplakan (Tracing)</h3>
                 
                 <div class="tracing-stack flex-grow relative">
-                    <!-- 1. Canvas Tracing (Lapisan Atas) -->
                     <canvas id="tracing-canvas"></canvas>
 
-                    <!-- 2. Huruf Arab Panduan (Lapisan Bawah, Samar) -->
-                    <div id="guide-letter" class="arabic-font text-[10rem] md:text-[12rem] text-gray-300 opacity-50 font-bold leading-none h-full flex items-center justify-center transition duration-300">
+                    <div id="guide-letter" class="arabic-font text-[8rem] sm:text-[10rem] md:text-[12rem] text-gray-300 opacity-50 font-bold leading-none h-full flex items-center justify-center transition duration-300">
                         ا
                     </div>
                 </div>
@@ -122,15 +113,11 @@
             
         </div>
 
-        <!-- AREA PILIHAN HURUF (GRID INTERAKTIF) -->
         <div id="buttons-area" class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 md:gap-3">
-            <!-- Tombol-tombol akan di-generate oleh JavaScript -->
-        </div>
+            </div>
 
-        <!-- AUDIO PLAYER (Tersembunyi) -->
         <audio id="audio-player" preload="auto"></audio>
 
-        <!-- KOTAK PESAN (Untuk Notifikasi Audio Hilang) -->
         <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 opacity-0 pointer-events-none" role="alert">
             <strong class="font-bold">Error Audio!</strong>
             <span id="message-text" class="block sm:inline">File audio tidak ditemukan.</span>
@@ -163,9 +150,9 @@
 
         // --- ELEMEN DOM ---
         const audioPlayer = document.getElementById('audio-player');
-        const visualAudioBox = document.getElementById('visual-audio-box'); // Kotak Kiri
-        const arabicLetterEl = document.getElementById('arabic-letter'); // Huruf Arab (Kiri)
-        const guideLetterEl = document.getElementById('guide-letter');   // Huruf Panduan (Kanan)
+        const visualAudioBox = document.getElementById('visual-audio-box'); 
+        const arabicLetterEl = document.getElementById('arabic-letter'); 
+        const guideLetterEl = document.getElementById('guide-letter');   
         const letterNameEl = document.getElementById('letter-name');
         const buttonsArea = document.getElementById('buttons-area');
         const messageBox = document.getElementById('message-box');
@@ -185,12 +172,12 @@
             const container = document.querySelector('.tracing-stack');
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
+            // Clear canvas saat di-resize
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
         }
 
         /**
          * Menggambar garis pada canvas
-         * @param {number} x Koordinat X saat ini
-         * @param {number} y Koordinat Y saat ini
          */
         function draw(x, y) {
             if (!isDrawing) return;
@@ -199,9 +186,8 @@
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(x, y);
             
-            // Style garis
-            ctx.strokeStyle = '#f87171'; // Warna Merah Muda/Coral
-            ctx.lineWidth = 20; // Ketebalan garis
+            ctx.strokeStyle = '#f87171'; 
+            ctx.lineWidth = 20; 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             
@@ -210,28 +196,18 @@
             [lastX, lastY] = [x, y];
         }
 
-        /**
-         * Menghapus semua jejak di canvas
-         */
         window.clearTracing = function() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        /**
-         * Mendapatkan koordinat X dan Y dari event (Mouse atau Touch)
-         * @param {Event} e Event mouse atau touch
-         * @returns {{x: number, y: number}} Koordinat relatif ke canvas
-         */
         function getCanvasXY(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
 
             if (e.touches && e.touches.length > 0) {
-                // Untuk Touch Events
                 clientX = e.touches[0].clientX;
                 clientY = e.touches[0].clientY;
             } else {
-                // Untuk Mouse Events
                 clientX = e.clientX;
                 clientY = e.clientY;
             }
@@ -290,22 +266,17 @@
         }
 
         function updateDisplay() {
-            // Update Huruf di Kotak Kiri (Audio/Visual)
             arabicLetterEl.textContent = currentLetter.arabic;
             letterNameEl.textContent = currentLetter.name;
-            
-            // Update Huruf Panduan di Kotak Kanan (Tracing)
             guideLetterEl.textContent = currentLetter.arabic;
             
-            clearTracing(); // Hapus jejak saat huruf ganti
+            clearTracing(); 
 
-            // Efek visual pulsing (simulasi sentuhan/tracing)
             visualAudioBox.classList.add('sensory-pulse');
             setTimeout(() => {
                 visualAudioBox.classList.remove('sensory-pulse');
             }, 500);
 
-            // Perbarui status aktif pada tombol
             document.querySelectorAll('.letter-button').forEach(btn => {
                 if (btn.dataset.letter === currentLetter.name) {
                     btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
@@ -318,6 +289,7 @@
         }
 
         window.playCurrentAudio = function() {
+            // Menggunakan .mp3 yang sudah dikoreksi
             const audioPath = `audio/${currentLetter.file}.mp3`;
             
             audioPlayer.pause();
@@ -370,3 +342,6 @@
 
 </body>
 </html>
+```eof
+
+Dengan perubahan ini, aplikasi akan terlihat rapi dan optimal baik di layar besar maupun di layar kecil ponsel.
