@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Belajar Hijaiyah Multisensori (Tracing)</title>
+    <!-- Memuat Tailwind CSS untuk styling modern dan responsif -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Mengatur font Arabic agar terlihat jelas dan konsisten */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap');
         .arabic-font {
             font-family: 'Amiri', 'Traditional Arabic', serif;
-            line-height: 1; 
+            line-height: 1.2; 
             user-select: none;
             position: relative;
         }
@@ -39,9 +40,11 @@
             z-index: 5;
             pointer-events: none; 
         }
-        /* Mengatur tampilan huruf di kotak audio */
-        #arabic-letter {
-             line-height: 1.2;
+        /* Flexbox untuk memastikan bentuk sambung sejajar */
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
     </style>
 </head>
@@ -67,42 +70,57 @@
                 <span class="text-primary">✨ Belajar Hijaiyah Fathah Multisensori ✨</span>
             </h1>
             <p class="text-lg text-gray-600 mt-2">
-                Sentuh huruf untuk mendengarkan, dan Jiplak (Tracing) huruf di kotak sebelah kanan!
+                Lihat, Dengarkan, dan Latih Sentuhan dengan bentuk huruf sambung yang benar.
             </p>
         </header>
         
+        <!-- PANDUAN JELAS -->
         <div class="bg-accent/10 p-4 md:p-5 rounded-xl shadow-inner mb-8 border-l-4 border-accent">
             <h2 class="text-xl font-bold text-accent mb-2">PANDUAN LATIHAN:</h2>
             <ol class="list-decimal list-inside text-gray-700 space-y-1 ml-4 text-base">
                 <li>Klik tombol huruf di bawah untuk memilih huruf baru.</li>
-                <li>**Lihat dan Dengarkan** di Kotak Kiri. Klik huruf Arab untuk memutar audio.</li>
-                <li>**Latih Sentuhan** di Kotak Kanan. Gunakan mouse atau jari Anda untuk menjiplak huruf yang samar.</li>
+                <li>**Kotak Kiri:** Pelajari bentuk huruf (termasuk sambungan) dan klik huruf besar untuk mendengarkan.</li>
+                <li>**Kotak Kanan:** Gunakan mouse atau jari Anda untuk menjiplak huruf yang samar (kinestetik).</li>
             </ol>
         </div>
 
-        <div id="display-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-auto md:h-[30rem]">
+        <!-- AREA TAMPILAN DUA KOLOM (VISUAL/AUDIO & TRACING/KINESTETIK) -->
+        <!-- MENGHAPUS md:h-[30rem] agar tinggi konten tidak terpotong di layar kecil -->
+        <div id="display-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-auto"> 
             
-            <div id="visual-audio-box" class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-primary/50 text-center flex flex-col justify-center items-center transition duration-300 ease-in-out">
-                <h3 class="text-xl font-semibold text-gray-700 mb-4">Kotak 1: Lihat & Dengarkan</h3>
+            <!-- KOTAK KIRI: VISUAL & AUDIO (Bentuk Lengkap) -->
+            <div id="visual-audio-box" class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-primary/50 text-center flex flex-col justify-between items-center transition duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Kotak 1: Harakat & Bentuk Sambung</h3>
+                
+                <!-- Huruf Utama (Dengan Fathah) -->
                 <div id="arabic-letter" 
-                     class="arabic-font text-[8rem] sm:text-[10rem] md:text-[12rem] text-gray-900 font-bold h-36 sm:h-48 md:h-56 flex items-center justify-center cursor-pointer hover:scale-105 transition duration-200"
+                     class="arabic-font text-[8rem] sm:text-[10rem] md:text-[12rem] text-gray-900 font-bold flex items-center justify-center cursor-pointer hover:scale-105 transition duration-200 w-full min-h-[10rem] md:min-h-[14rem]"
                      onclick="playCurrentAudio()">
-                    ا
+                    اَ
                 </div>
                 <p id="letter-name" class="text-2xl md:text-3xl font-semibold text-primary mt-4">A</p>
+
+                <!-- Bentuk Sambung (Awal, Tengah, Akhir) -->
+                <div id="form-display" class="w-full mt-6 p-4 border-t border-gray-200 grid grid-cols-3 gap-2">
+                    <!-- Diisi oleh JS -->
+                </div>
+                
                 <button onclick="playCurrentAudio()" class="mt-4 px-6 py-3 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary/80 transition duration-150">
                     🔊 Ulangi Audio
                 </button>
             </div>
             
+            <!-- KOTAK KANAN: TRACING (SENTUHAN) -->
             <div id="tracing-box" class="bg-gray-100 p-4 rounded-xl shadow-2xl border-b-4 border-accent/50 text-center flex flex-col justify-between">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Kotak 2: Latih Jiplakan (Tracing)</h3>
                 
                 <div class="tracing-stack flex-grow relative">
+                    <!-- 1. Canvas Tracing (Lapisan Atas) -->
                     <canvas id="tracing-canvas"></canvas>
 
+                    <!-- 2. Huruf Arab Panduan (Lapisan Bawah, Samar) -->
                     <div id="guide-letter" class="arabic-font text-[8rem] sm:text-[10rem] md:text-[12rem] text-gray-300 opacity-50 font-bold leading-none h-full flex items-center justify-center transition duration-300">
-                        ا
+                        اَ
                     </div>
                 </div>
 
@@ -113,11 +131,15 @@
             
         </div>
 
+        <!-- AREA PILIHAN HURUF (GRID INTERAKTIF) -->
         <div id="buttons-area" class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 md:gap-3">
-            </div>
+            <!-- Tombol-tombol akan di-generate oleh JavaScript -->
+        </div>
 
+        <!-- AUDIO PLAYER (Tersembunyi) -->
         <audio id="audio-player" preload="auto"></audio>
 
+        <!-- KOTAK PESAN (Untuk Notifikasi Audio Hilang) -->
         <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500 opacity-0 pointer-events-none" role="alert">
             <strong class="font-bold">Error Audio!</strong>
             <span id="message-text" class="block sm:inline">File audio tidak ditemukan.</span>
@@ -126,23 +148,69 @@
     </div>
 
     <script>
-        // --- KONFIGURASI APLIKASI ---
+        // FATHAH HARAKAT (Unicode: \u064e)
+        const FATHAH = '\u064e';
+
+        // --- KONFIGURASI APLIKASI (Dengan Bentuk Sambung) ---
         const HIJAIYAH_LETTERS = {
-            "A": { arabic: "ا", file: "alif" }, "Ba": { arabic: "ب", file: "ba" },
-            "Ta": { arabic: "ت", file: "ta" }, "Tsa": { arabic: "ث", file: "tsa" },
-            "Ja": { arabic: "ج", file: "jim" }, "Ha(b)": { arabic: "ح", file: "ha" },
-            "Kha": { arabic: "خ", file: "kha" }, "Da": { arabic: "د", file: "dal" },
-            "Dza": { arabic: "ذ", file: "dzal" }, "Ra": { arabic: "ر", file: "ra" },
-            "Za": { arabic: "ز", file: "zay" }, "Sa": { arabic: "س", file: "sin" },
-            "Sha": { arabic: "ش", file: "shin" }, "Sso": { arabic: "ص", file: "shod" },
-            "Dho": { arabic: "ض", file: "dhud" }, "Tho": { arabic: "ط", file: "tho" },
-            "Zho": { arabic: "ظ", file: "zho" }, "'A": { arabic: "ع", file: "ain" },
-            "Gha": { arabic: "غ", file: "ghain" }, "Fa": { arabic: "ف", file: "fa" },
-            "Qo": { arabic: "ق", file: "qof" }, "Ka": { arabic: "ك", file: "kaf" },
-            "La": { arabic: "ل", file: "lam" }, "Ma": { arabic: "م", file: "mim" },
-            "Na": { arabic: "ن", file: "nun" }, "Wa": { arabic: "و", file: "waw" },
-            "Ha(k)": { arabic: "هـ", file: "ha2" }, "A'": { arabic: "ء", file: "hamzah" },
-            "Ya": { arabic: "ي", file: "ya" }
+            "A": { base: "ا", file: "alif", 
+                forms: { Awal: "ا" + FATHAH, Tengah: "ـا" + FATHAH, Akhir: "ـا" + FATHAH } }, 
+            "Ba": { base: "ب", file: "ba", 
+                forms: { Awal: "ب" + FATHAH + "ـ", Tengah: "ـب" + FATHAH + "ـ", Akhir: "ـب" + FATHAH } },
+            "Ta": { base: "ت", file: "ta", 
+                forms: { Awal: "ت" + FATHAH + "ـ", Tengah: "ـت" + FATHAH + "ـ", Akhir: "ـت" + FATHAH } },
+            "Tsa": { base: "ث", file: "tsa", 
+                forms: { Awal: "ث" + FATHAH + "ـ", Tengah: "ـث" + FATHAH + "ـ", Akhir: "ـث" + FATHAH } },
+            "Ja": { base: "ج", file: "jim", 
+                forms: { Awal: "ج" + FATHAH + "ـ", Tengah: "ـج" + FATHAH + "ـ", Akhir: "ـج" + FATHAH } },
+            "Ha(b)": { base: "ح", file: "ha", 
+                forms: { Awal: "ح" + FATHAH + "ـ", Tengah: "ـح" + FATHAH + "ـ", Akhir: "ـح" + FATHAH } },
+            "Kha": { base: "خ", file: "kha", 
+                forms: { Awal: "خ" + FATHAH + "ـ", Tengah: "ـخ" + FATHAH + "ـ", Akhir: "ـخ" + FATHAH } },
+            "Da": { base: "د", file: "dal", 
+                forms: { Awal: "د" + FATHAH, Tengah: "ـد" + FATHAH, Akhir: "ـد" + FATHAH } },
+            "Dza": { base: "ذ", file: "dzal", 
+                forms: { Awal: "ذ" + FATHAH, Tengah: "ـذ" + FATHAH, Akhir: "ـذ" + FATHAH } },
+            "Ra": { base: "ر", file: "ra", 
+                forms: { Awal: "ر" + FATHAH, Tengah: "ـر" + FATHAH, Akhir: "ـر" + FATHAH } },
+            "Za": { base: "ز", file: "zay", 
+                forms: { Awal: "ز" + FATHAH, Tengah: "ـز" + FATHAH, Akhir: "ـز" + FATHAH } },
+            "Sa": { base: "س", file: "sin", 
+                forms: { Awal: "س" + FATHAH + "ـ", Tengah: "ـس" + FATHAH + "ـ", Akhir: "ـس" + FATHAH } },
+            "Sha": { base: "ش", file: "shin", 
+                forms: { Awal: "ش" + FATHAH + "ـ", Tengah: "ـش" + FATHAH + "ـ", Akhir: "ـش" + FATHAH } },
+            "Sso": { base: "ص", file: "shod", 
+                forms: { Awal: "ص" + FATHAH + "ـ", Tengah: "ـص" + FATHAH + "ـ", Akhir: "ـص" + FATHAH } },
+            "Dho": { base: "ض", file: "dhud", 
+                forms: { Awal: "ض" + FATHAH + "ـ", Tengah: "ـض" + FATHAH + "ـ", Akhir: "ـض" + FATHAH } },
+            "Tho": { base: "ط", file: "tho", 
+                forms: { Awal: "ط" + FATHAH + "ـ", Tengah: "ـط" + FATHAH + "ـ", Akhir: "ـط" + FATHAH } },
+            "Zho": { base: "ظ", file: "zho", 
+                forms: { Awal: "ظ" + FATHAH + "ـ", Tengah: "ـظ" + FATHAH + "ـ", Akhir: "ـظ" + FATHAH } },
+            "'A": { base: "ع", file: "ain", 
+                forms: { Awal: "ع" + FATHAH + "ـ", Tengah: "ـع" + FATHAH + "ـ", Akhir: "ـع" + FATHAH } },
+            "Gha": { base: "غ", file: "ghain", 
+                forms: { Awal: "غ" + FATHAH + "ـ", Tengah: "ـغ" + FATHAH + "ـ", Akhir: "ـغ" + FATHAH } },
+            "Fa": { base: "ف", file: "fa", 
+                forms: { Awal: "ف" + FATHAH + "ـ", Tengah: "ـف" + FATHAH + "ـ", Akhir: "ـف" + FATHAH } },
+            "Qo": { base: "ق", file: "qof", 
+                forms: { Awal: "ق" + FATHAH + "ـ", Tengah: "ـق" + FATHAH + "ـ", Akhir: "ـق" + FATHAH } },
+            "Ka": { base: "ك", file: "kaf", 
+                forms: { Awal: "ك" + FATHAH + "ـ", Tengah: "ـك" + FATHAH + "ـ", Akhir: "ـك" + FATHAH } },
+            "La": { base: "ل", file: "lam", 
+                forms: { Awal: "ل" + FATHAH + "ـ", Tengah: "ـل" + FATHAH + "ـ", Akhir: "ـل" + FATHAH } },
+            "Ma": { base: "م", file: "mim", 
+                forms: { Awal: "م" + FATHAH + "ـ", Tengah: "ـم" + FATHAH + "ـ", Akhir: "ـم" + FATHAH } },
+            "Na": { base: "ن", file: "nun", 
+                forms: { Awal: "ن" + FATHAH + "ـ", Tengah: "ـن" + FATHAH + "ـ", Akhir: "ـن" + FATHAH } },
+            "Wa": { base: "و", file: "waw", 
+                forms: { Awal: "و" + FATHAH, Tengah: "ـو" + FATHAH, Akhir: "ـو" + FATHAH } },
+            "Ha(k)": { base: "ه", file: "ha2", 
+                forms: { Awal: "ه" + FATHAH + "ـ", Tengah: "ـه" + FATHAH + "ـ", Akhir: "ـه" + FATHAH } },
+            "A'": { base: "ء", file: "hamzah", 
+                forms: { Awal: "ء" + FATHAH, Tengah: "ـئ" + FATHAH + "ـ", Akhir: "ـئ" + FATHAH } },
+            "Ya": { base: "ي", file: "ya", 
+                forms: { Awal: "ي" + FATHAH + "ـ", Tengah: "ـي" + FATHAH + "ـ", Akhir: "ـي" + FATHAH } }
         };
 
         let currentLetter = HIJAIYAH_LETTERS["A"];
@@ -155,6 +223,7 @@
         const guideLetterEl = document.getElementById('guide-letter');   
         const letterNameEl = document.getElementById('letter-name');
         const buttonsArea = document.getElementById('buttons-area');
+        const formDisplayEl = document.getElementById('form-display'); 
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         
@@ -165,34 +234,24 @@
         let lastX = 0;
         let lastY = 0;
 
-        /**
-         * Mengatur ukuran canvas agar sesuai dengan kontainer tracing-stack
-         */
+        // Fungsi resize dan tracing tetap sama
         function resizeCanvas() {
             const container = document.querySelector('.tracing-stack');
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
-            // Clear canvas saat di-resize
             ctx.clearRect(0, 0, canvas.width, canvas.height); 
         }
 
-        /**
-         * Menggambar garis pada canvas
-         */
         function draw(x, y) {
             if (!isDrawing) return;
-            
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(x, y);
-            
             ctx.strokeStyle = '#f87171'; 
             ctx.lineWidth = 20; 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            
             ctx.stroke();
-            
             [lastX, lastY] = [x, y];
         }
 
@@ -203,7 +262,6 @@
         function getCanvasXY(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
-
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches[0].clientX;
                 clientY = e.touches[0].clientY;
@@ -211,47 +269,36 @@
                 clientX = e.clientX;
                 clientY = e.clientY;
             }
-            
             return {
                 x: clientX - rect.left,
                 y: clientY - rect.top
             };
         }
 
-        // --- LISTENER TRACING (Mouse dan Touch) ---
-
-        // Mouse Listeners
         canvas.addEventListener('mousedown', (e) => {
             isDrawing = true;
             [lastX, lastY] = [e.offsetX, e.offsetY];
             e.preventDefault(); 
         });
-
         canvas.addEventListener('mousemove', (e) => {
             draw(e.offsetX, e.offsetY);
             e.preventDefault();
         });
-
         canvas.addEventListener('mouseup', () => isDrawing = false);
         canvas.addEventListener('mouseout', () => isDrawing = false);
-
-        // Touch Listeners (Untuk Perangkat Mobile)
         canvas.addEventListener('touchstart', (e) => {
             const { x, y } = getCanvasXY(e);
             isDrawing = true;
             [lastX, lastY] = [x, y];
             e.preventDefault(); 
         }, { passive: false });
-
         canvas.addEventListener('touchmove', (e) => {
             const { x, y } = getCanvasXY(e);
             draw(x, y);
             e.preventDefault();
         }, { passive: false });
-
         canvas.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('touchcancel', () => isDrawing = false);
-
         window.addEventListener('resize', resizeCanvas);
 
 
@@ -265,10 +312,36 @@
             }, 5000);
         }
 
+        function renderForms() {
+            let html = '';
+            
+            // Loop melalui Awal, Tengah, dan Akhir
+            for (const position in currentLetter.forms) {
+                const form = currentLetter.forms[position];
+                html += `
+                    <!-- Disesuaikan: p-2 menjadi p-3 dan mt-1 menjadi mt-2 untuk jarak vertikal yang lebih lega -->
+                    <div class="form-item border rounded-lg p-3 bg-gray-50 shadow-sm">
+                        <span class="arabic-font text-3xl text-gray-800 font-bold">${form}</span>
+                        <span class="text-sm font-medium text-gray-500 mt-2">${position}</span>
+                    </div>
+                `;
+            }
+            formDisplayEl.innerHTML = html;
+        }
+
+
         function updateDisplay() {
-            arabicLetterEl.textContent = currentLetter.arabic;
+            const isolatedLetterFathah = currentLetter.base + FATHAH;
+
+            // Update Huruf Utama (Kiri)
+            arabicLetterEl.textContent = isolatedLetterFathah;
             letterNameEl.textContent = currentLetter.name;
-            guideLetterEl.textContent = currentLetter.arabic;
+            
+            // Update Huruf Panduan (Kanan)
+            guideLetterEl.textContent = isolatedLetterFathah;
+            
+            // Render Bentuk Sambung
+            renderForms();
             
             clearTracing(); 
 
@@ -277,6 +350,7 @@
                 visualAudioBox.classList.remove('sensory-pulse');
             }, 500);
 
+            // Perbarui status aktif pada tombol
             document.querySelectorAll('.letter-button').forEach(btn => {
                 if (btn.dataset.letter === currentLetter.name) {
                     btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
@@ -289,7 +363,6 @@
         }
 
         window.playCurrentAudio = function() {
-            // Menggunakan .mp3 yang sudah dikoreksi
             const audioPath = `audio/${currentLetter.file}.mp3`;
             
             audioPlayer.pause();
@@ -317,10 +390,13 @@
             Object.keys(HIJAIYAH_LETTERS).forEach(name => {
                 const letter = HIJAIYAH_LETTERS[name];
                 letter.name = name; 
+                
+                // Tampilkan huruf dengan Fathah di tombol
+                const letterWithFathah = letter.base + FATHAH;
 
                 const button = document.createElement('button');
                 button.className = 'letter-button arabic-font text-3xl md:text-5xl font-bold p-2 md:p-3 rounded-lg border-2 transition-all duration-200 bg-gray-200 hover:bg-primary/20 text-gray-800 border-gray-300';
-                button.textContent = letter.arabic;
+                button.textContent = letterWithFathah;
                 button.dataset.letter = name;
                 button.onclick = () => selectLetter(name);
                 
@@ -333,7 +409,6 @@
         // --- INISIALISASI ---
         window.onload = function() {
             renderButtons();
-            // Perlu penundaan singkat untuk memastikan DOM sudah stabil sebelum mengukur ukuran
             setTimeout(() => {
                 resizeCanvas(); 
             }, 100); 
@@ -342,6 +417,3 @@
 
 </body>
 </html>
-```eof
-
-Dengan perubahan ini, aplikasi akan terlihat rapi dan optimal baik di layar besar maupun di layar kecil ponsel.
